@@ -8,9 +8,25 @@ public class Word {
 
     private String mMiwokTranslation;
 
+    private int mImageResourceID;
+
+
     public Word(String defaultTranslation, String miwokTranslation) {
         mDefaultTranslation = defaultTranslation;
         mMiwokTranslation = miwokTranslation;
+    }
+
+    /**
+     * public constructor with three inputs into the Word array, one of those being an image resource ID.
+     *
+     * @param defaultTranslation the default translation of the word, i.e. English
+     * @param miwokTranslation   the Miwok translation of the word
+     * @param imageResourceID    a String of the R.drawable... resource ID.
+     */
+    public Word(String defaultTranslation, String miwokTranslation, int imageResourceID) {
+        mDefaultTranslation = defaultTranslation;
+        mMiwokTranslation = miwokTranslation;
+        mImageResourceID = imageResourceID;
     }
 
     /**
@@ -25,5 +41,9 @@ public class Word {
      */
     public String getMiwokTranslation() {
         return mMiwokTranslation;
+    }
+
+    public int getImageResourceID() {
+        return mImageResourceID;
     }
 }
