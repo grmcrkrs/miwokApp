@@ -36,12 +36,10 @@
             android:id="@+id/defaultTextView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_gravity="top"
-            android:layout_weight="1"
             android:gravity="top"
+            android:layout_weight="1"
             android:paddingStart="16dp"
             android:paddingLeft="16dp"
-            android:paddingTop="16dp"
             android:textSize="18sp"
             tools:text="one" />
 

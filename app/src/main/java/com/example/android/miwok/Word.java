@@ -10,23 +10,34 @@ public class Word {
 
     private int mImageResourceID;
 
+    private int mSoundResourceID;
 
-    public Word(String defaultTranslation, String miwokTranslation) {
+    /**
+     * public construcgor with three inputs into the Word array, including the soundResourceID
+     *
+     * @param defaultTranslation the default translation of the word
+     * @param miwokTranslation   the miwok translation of the word
+     * @param soundResourceID    is the address of the raw-sound file
+     */
+
+    public Word(String defaultTranslation, String miwokTranslation, int soundResourceID) {
         mDefaultTranslation = defaultTranslation;
         mMiwokTranslation = miwokTranslation;
+        mSoundResourceID = soundResourceID;
     }
 
     /**
-     * public constructor with three inputs into the Word array, one of those being an image resource ID.
+     * public constructor with four inputs into the Word array, one of those being an image resource ID.
      *
      * @param defaultTranslation the default translation of the word, i.e. English
      * @param miwokTranslation   the Miwok translation of the word
      * @param imageResourceID    a String of the R.drawable... resource ID.
      */
-    public Word(String defaultTranslation, String miwokTranslation, int imageResourceID) {
+    public Word(String defaultTranslation, String miwokTranslation, int imageResourceID, int soundResourceID) {
         mDefaultTranslation = defaultTranslation;
         mMiwokTranslation = miwokTranslation;
         mImageResourceID = imageResourceID;
+        mSoundResourceID = soundResourceID;
     }
 
     /**
@@ -45,5 +56,9 @@ public class Word {
 
     public int getImageResourceID() {
         return mImageResourceID;
+    }
+
+    public int getSoundResourceID() {
+        return mSoundResourceID;
     }
 }
