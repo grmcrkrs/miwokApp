@@ -1,6 +1,9 @@
 package com.example.android.miwok;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class NumbersActivity extends AppCompatActivity {
     private MediaPlayer mMediaPlayer; //create global variable of instance MediaPlayer
@@ -20,16 +24,46 @@ public class NumbersActivity extends AppCompatActivity {
         }
     };
 
+    AudioManager.OnAudioFocusChangeListener afChangeListener =
+            new AudioManager.OnAudioFocusChangeListener() {
+                public void onAudioFocusChange(int focusChange) {
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        //the two pipes above equate to "or", meaning if one OR the other is true,
+                        //the whole statement is true.
+                        releaseMediaPlayer();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
+                            focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                        // Pause playback
+                        mMediaPlayer.pause();
+                        mMediaPlayer.seekTo(0);
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                        // Your app has been granted audio focus again
+                        // Raise volume to normal, restart playback if necessary
+                        mMediaPlayer.start();
+                    }
+                }
+            };
+
+    /**
+     * handles audio focus;
+     */
+    private AudioManager mAudioManager;
+
     private void releaseMediaPlayer() {
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
             mMediaPlayer = null;
+
+            mAudioManager.abandonAudioFocus(afChangeListener);
         }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_view);
+
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
         final ArrayList<Word> words = new ArrayList<>();
         //setting the ArrayList to final fixes the scope issue when setting the SetOnClickListener
         words.add(new Word("one", "lutti", R.drawable.number_one, R.raw.number_one));
@@ -60,12 +94,28 @@ public class NumbersActivity extends AppCompatActivity {
                 //in the words array at .get(position);
                 Log.v("NumbersActivity", "word=" + word);
                 releaseMediaPlayer();
-                mMediaPlayer = MediaPlayer.create(NumbersActivity.this, word.getSoundResourceID());
-                //create MediaPlayer object with current activity context, resource iD value =word
-                mMediaPlayer.start();
-                mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                // Request audio focus for playback
+                int result = mAudioManager.requestAudioFocus(afChangeListener,
+                        // Use the music stream.
+                        AudioManager.STREAM_MUSIC,
+                        // Request permanent focus.
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                    // we have audio focus
+                    mMediaPlayer = MediaPlayer.create(NumbersActivity.this, word.getSoundResourceID());
+                    //create MediaPlayer object with current activity context, resource iD value =word
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        releaseMediaPlayer();
     }
 }
 
